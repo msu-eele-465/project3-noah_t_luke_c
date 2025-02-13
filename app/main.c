@@ -8,6 +8,8 @@ int main(void)
 
     P1DIR |= BIT0;                          // P1.0 as output
     P1OUT &= ~BIT0;                         // Clear P1.0
+
+    P6DIR |= BIT
     
     PM5CTL0 &= ~LOCKLPM5;                   // GPIO on            
 
