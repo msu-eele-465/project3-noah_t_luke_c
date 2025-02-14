@@ -1,69 +1,75 @@
-#include "intrinsics.h"
 #include "msp430fr2355.h"
 #include <msp430.h>
 #include <stdbool.h>
+#include <string.h>
 
-int main(void)
-{ 
-    #define unlock_code "1738"
+#define unlock_code "1738"
+const char keys[4][4] = {{'1','2','3','A'},{'4','5','6','B'},{'7','8','9','C'},{'*','0','#','D'}};
+const char rowPins[4] = {BIT0, BIT1, BIT2, BIT3};
+const char colPins[4] = {BIT0, BIT1, BIT2, BIT3};
+
+int main(void) {
     char code_entered[5] = "";
     int index_code = 0;
     bool unlock = false;
 
-    WDTCTL = WDTPW | WDTHOLD;               // Stop watchdog timer
-    
-    P1DIR |= BIT0;                          // P1.0 as output, used for heartbeat led
-    P1OUT &= ~BIT0;                         // Clear P1.0
+    WDTCTL = WDTPW | WDTHOLD;  // Stop watchdog timer
 
-    // Column pins are 6.0 - 6.3, right 4 pins on Keypad, decending left to right
-    P6DIR |= BIT0 | BIT1 | BIT2 | BIT3;     // Set col pins as outputs
-    P6REN |= BIT0 | BIT1 | BIT2 | BIT3;     // Pull up/down resistors
-    P6OUT |= BIT0 | BIT1 | BIT2 | BIT3;     // Pull-up for resistors
+    P1DIR |= BIT0;  // P1.0 as output, used for heartbeat LED
+    P1OUT &= ~BIT0;  // Clear P1.0
 
-    // Row pins are 5.0 - 5.3, left 4 pins, decending left to right
-    P5DIR &= ~(BIT0 | BIT1 | BIT2 | BIT3);  // Set row pins as inputs
-    P5REN |= BIT0 | BIT1 | BIT2 | BIT3;     // Pull up/down resistors
-    P5OUT &= ~(BIT0 | BIT1 | BIT2 | BIT3);  // Pull-down for resistors
+    P6DIR |= BIT6;  // Green LED feedback
+    P6OUT &= ~BIT6;
 
-    PM5CTL0 &= ~LOCKLPM5;                   // GPIO on            
+    // Column pins are 6.0 - 6.3, right 4 pins on Keypad, descending left to right
+    P6DIR &= ~(BIT0 + BIT1 + BIT2 + BIT3);  // Clear column pins
+    P6DIR |= (BIT0 + BIT1 + BIT2 + BIT3);  // Set column pins as outputs
+    P6OUT &= ~(BIT0 + BIT1 + BIT2 + BIT3);  // Set column pins low
 
-    TB0CTL |= TBCLR;                        // Clear timer and dividers
-    TB0CTL |= TBSSEL__ACLK;                 // Use ACLK                   
-    TB0CTL |= MC__UP;                       // Up counting mode
-    TB0CCR0 = 32768;                        // Compare value
+    // Row pins are 5.0 - 5.3, left 4 pins, descending left to right
+    P5DIR &= ~(BIT0 + BIT1 + BIT2 + BIT3);  // Set row pins as inputs
+    P5REN |= (BIT0 + BIT1 + BIT2 + BIT3);  // Enable pull-up/down resistors
+    P5OUT &= ~(BIT0 + BIT1 + BIT2 + BIT3);  // Set pull-down for resistors
 
-    TB0CCTL0 &= ~CCIFG;                     // Clear CCR0 flag
-    TB0CCTL0 |= CCIE;                       // Enable flag
-    __enable_interrupt(); 
+    PM5CTL0 &= ~LOCKLPM5;  // Enable GPIO
 
-    while(1){}                              // Loop forever
+    TB0CTL |= TBCLR;  // Clear timer and dividers
+    TB0CTL |= TBSSEL__ACLK;  // Use ACLK
+    TB0CTL |= MC__UP;  // Up counting mode
+    TB0CCR0 = 32768;  // Compare value
+
+    TB0CCTL0 &= ~CCIFG;  // Clear CCR0 flag
+    TB0CCTL0 |= CCIE;  // Enable flag
+    __enable_interrupt();
+
+    while (1) {  // Loop forever
+        char key = scanPad();
+        
+    }
 
     return 0;
 }
 
-int scanPad(){
-    char keys[4][4] = {{'1','2','3','A'},
-                       {'4','5','6','B'},
-                       {'7','8','9','C'},
-                       {'*','0','#','D'}};
-    
-    int row, col = 0;                       // Loop variables
-    P6OUT &= ~(BIT0 | BIT1 | BIT2 | BIT3);  // Clear all column pins
+//-----------------------------------------------Scan Keypad------------------------------------------------------------------------
 
-    for(col = 0; col < 4; col++){
-        P6OUT |= (1 << col);                // Set single column high
-        __delay_cycles(100);                // Delay let signal stop oscillating
-        
-        for (row = 0; row < 4; row++){
-            if (P5IN & (1 << row) != 0){    // Check if row high, if high key pressed
-                return keys[row][col];      // If pressed return the key
-            }       
+char scanPad() {
+    int row, col;  // Loop variables
+
+    for (col = 0; col < 4; col++) {
+        P6OUT &= ~(BIT0 | BIT1 | BIT2 | BIT3);  // Clear all column pins
+        P6OUT |= colPins[col];  // Set the current column pin high
+
+        for (row = 0; row < 4; row++) {
+            if ((P5IN & rowPins[row]) != 0) {  // Check if the row pin is high
+                P6OUT ^= BIT6;  // Toggle LED for feedback
+                while ((P5IN & rowPins[row]) != 0);  // Wait for key release
+                __delay_cycles(50000);  // Debounce delay
+                return keys[row][col];  // Return the pressed key
+            }
         }
-        P6OUT &= ~(1 << col);               // Set the column back low
     }
 
-    return 0;
-
+    return 0;  // Return 0 if no key is pressed
 }
 
 //------------------------------------------------------------------------------
@@ -71,9 +77,7 @@ int scanPad(){
 //------------------------------------------------------------------------------
 
 #pragma vector = TIMER0_B0_VECTOR
-__interrupt void ISR_TB0_CCR0(void)
-{
-    P1OUT ^= BIT0;                          // Toggle led
-    TB0CCTL0 &= ~CCIFG;                     // Clear flag
-
+__interrupt void ISR_TB0_CCR0(void) {
+    P1OUT ^= BIT0;  // Toggle LED
+    TB0CCTL0 &= ~CCIFG;  // Clear the interrupt flag
 }
