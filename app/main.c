@@ -8,19 +8,12 @@ const char keys[4][4] = {{'1','2','3','A'},{'4','5','6','B'},{'7','8','9','C'},{
 const char rowPins[4] = {BIT0, BIT1, BIT2, BIT3};
 const char colPins[4] = {BIT0, BIT1, BIT2, BIT3};
 
-<<<<<<< HEAD
     P1DIR |= BIT0;                          // P1.0 as output
     P1OUT &= ~BIT0;                         // Clear P1.0
 
     P6DIR |= BIT
     
     PM5CTL0 &= ~LOCKLPM5;                   // GPIO on            
-=======
-int main(void) {
-    char code_entered[5] = "";
-    int index_code = 0;
-    bool unlock = false;
->>>>>>> 87f47b430e1cce7f3bee7525f788028d75a74f13
 
     WDTCTL = WDTPW | WDTHOLD;  // Stop watchdog timer
 
