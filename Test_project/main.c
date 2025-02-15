@@ -26,6 +26,14 @@ int main(void) {
     P6DIR |= BIT6;  // Green LED feedback
     P6OUT &= ~BIT6;
 
+    // Status LED setup
+    P1DIR |= BIT1;  // P1.1 as output
+    P1OUT &= ~BIT1;  // Clear P1.1
+    P1DIR |= BIT2;  // P1.2 as output
+    P1OUT &= ~BIT2;  // Clear P1.2
+    P1DIR |= BIT3;  // P1.3 as output
+    P1OUT &= ~BIT3;  // Clear P1.3
+
     PM5CTL0 &= ~LOCKLPM5;  // Enable GPIO
 
     TB0CTL |= TBCLR;  // Clear timer and dividers
@@ -39,11 +47,17 @@ int main(void) {
 
 
     while (1) {  // Loop forever
+        P1OUT |= BIT3;
         while(scanPad() != '1');
+        //P1OUT &= ~BIT3;
+        P1OUT |= BIT2;
         while(scanPad() != '7');
         while(scanPad() != '3');
         while(scanPad() != '8');
-       P6OUT ^= BIT6;
+        P1OUT &= ~BIT2;
+        P1OUT &= ~BIT3;
+        P1OUT |= BIT1;
+        P6OUT ^= BIT6;
     }
 
     return 0;
