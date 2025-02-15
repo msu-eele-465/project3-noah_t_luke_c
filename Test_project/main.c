@@ -13,7 +13,7 @@
 
 int main(void) {
     keypadInit();
-    char key1;
+    int locked = 0;
     char code_entered[5] = "";
     int index_code = 0;
     bool unlock = false;
@@ -26,38 +26,32 @@ int main(void) {
     P6DIR |= BIT6;  // Green LED feedback
     P6OUT &= ~BIT6;
 
-    // Status LED setup
-    P1DIR |= BIT1;  // P1.1 as output
-    P1OUT &= ~BIT1;  // Clear P1.1
-    P1DIR |= BIT2;  // P1.2 as output
-    P1OUT &= ~BIT2;  // Clear P1.2
-    P1DIR |= BIT3;  // P1.3 as output
-    P1OUT &= ~BIT3;  // Clear P1.3
-
     PM5CTL0 &= ~LOCKLPM5;  // Enable GPIO
 
+    // Setup Timer B0
     TB0CTL |= TBCLR;  // Clear timer and dividers
     TB0CTL |= TBSSEL__ACLK;  // Use ACLK
     TB0CTL |= MC__UP;  // Up counting mode
-    TB0CCR0 = 32768;  // Compare value
+    TB0CCR0 = 32768;    // Compare value
 
+    // Set up timer compare IRQs
     TB0CCTL0 &= ~CCIFG;  // Clear CCR0 flag
     TB0CCTL0 |= CCIE;  // Enable flag
+
+
+
     __enable_interrupt();
 
 
-    while (1) {  // Loop forever
-        P1OUT |= BIT3;
-        while(scanPad() != '1');
-        //P1OUT &= ~BIT3;
-        P1OUT |= BIT2;
-        while(scanPad() != '7');
-        while(scanPad() != '3');
-        while(scanPad() != '8');
-        P1OUT &= ~BIT2;
-        P1OUT &= ~BIT3;
-        P1OUT |= BIT1;
-        P6OUT ^= BIT6;
+    while (locked == 0) {  // Loop until unlocked
+        lockKeypad();
+        locked = 1;
+    }
+    while(1) {          // Loop forever
+        char input = scanPad();
+        switch(input){
+            case 'D':   lockKeypad();
+        }
     }
 
     return 0;
