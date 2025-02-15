@@ -13,7 +13,7 @@
 
 int main(void) {
     keypadInit();
-    char key1;
+    int locked = 0;
     char code_entered[5] = "";
     int index_code = 0;
     bool unlock = false;
@@ -28,22 +28,30 @@ int main(void) {
 
     PM5CTL0 &= ~LOCKLPM5;  // Enable GPIO
 
+    // Setup Timer B0
     TB0CTL |= TBCLR;  // Clear timer and dividers
     TB0CTL |= TBSSEL__ACLK;  // Use ACLK
     TB0CTL |= MC__UP;  // Up counting mode
-    TB0CCR0 = 32768;  // Compare value
+    TB0CCR0 = 32768;    // Compare value
 
+    // Set up timer compare IRQs
     TB0CCTL0 &= ~CCIFG;  // Clear CCR0 flag
     TB0CCTL0 |= CCIE;  // Enable flag
+
+
+
     __enable_interrupt();
 
 
-    while (1) {  // Loop forever
-        while(scanPad() != '1');
-        while(scanPad() != '7');
-        while(scanPad() != '3');
-        while(scanPad() != '8');
-       P6OUT ^= BIT6;
+    while (locked == 0) {  // Loop until unlocked
+        lockKeypad();
+        locked = 1;
+    }
+    while(1) {          // Loop forever
+        char input = scanPad();
+        switch(input){
+            case 'D':   lockKeypad();
+        }
     }
 
     return 0;

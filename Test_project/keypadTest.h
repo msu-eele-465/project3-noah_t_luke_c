@@ -6,6 +6,15 @@ const char rowPins[4] = {BIT0, BIT1, BIT2, BIT3};
 const char colPins[4] = {BIT0, BIT1, BIT2, BIT3};
 
 void keypadInit(void){
+
+    // Status LED setup
+    P1DIR |= BIT1;  // P1.1 as output
+    P1OUT &= ~BIT1;  // Clear P1.1
+    P1DIR |= BIT2;  // P1.2 as output
+    P1OUT &= ~BIT2;  // Clear P1.2
+    P1DIR |= BIT3;  // P1.3 as output
+    P1OUT &= ~BIT3;  // Clear P1.3
+
     // Column pins are 6.0 - 6.3, right 4 pins on Keypad, descending left to right
     // Pin 5.0 is column 0 (connected to the middle of the keypad) (column 0 is the furthest left column)
     // Pin 5.3 is column 3 (connected to the right of the keypad) (column 3 is the furthest right column)
@@ -22,6 +31,19 @@ void keypadInit(void){
 }
 
 //-----------------------------------------------Scan Keypad------------------------------------------------------------------------
+
+void lockKeypad(){
+        P1OUT &= ~BIT1;
+        P1OUT |= BIT3;
+        while(scanPad() != '1');
+        P1OUT |= BIT2;
+        while(scanPad() != '7');
+        while(scanPad() != '3');
+        while(scanPad() != '8');
+        P1OUT &= ~BIT2;
+        P1OUT &= ~BIT3;
+        P1OUT |= BIT1;
+}
 
 char scanPad() {
     int row, col;  // Loop variables
