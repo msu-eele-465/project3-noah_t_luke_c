@@ -5,13 +5,16 @@
 #include <stdbool.h>
 #include <string.h>
 #include <keypadTest.h>
+#include<LEDbar.h>
 
 #define unlock_code "1738"
+#define A P6OUT.BIT4
 //const char keys[4][4] = {{'1','2','3','A'},{'4','5','6','B'},{'7','8','9','C'},{'*','0','#','D'}};
 //const char rowPins[4] = {BIT0, BIT1, BIT2, BIT3};
 //const char colPins[4] = {BIT0, BIT1, BIT2, BIT3};
 
 int main(void) {
+    LEDbarInit();
     keypadInit();
     int locked = 0;
     char code_entered[5] = "";
@@ -50,7 +53,11 @@ int main(void) {
     while(1) {          // Loop forever
         char input = scanPad();
         switch(input){
-            case 'D':   lockKeypad();
+            case '1':   lockKeypad();
+                        break;
+            case '1':   A = 1;
+                        P6OUT ^= BIT6;
+                        break;
         }
     }
 
