@@ -56,7 +56,7 @@ int main(void) {
         char input = scanPad();
         switch(input){
             case 'D':   lockKeypad();
-            case 'A':   turnON(1);
+            case 'A':   ON(1);
         }
     }
 
