@@ -1,7 +1,9 @@
+#include "intrinsics.h"
 #include <msp430.h>
 #include <stdbool.h>
 
 void LEDbarInit(void){
+    // Setting GPIO pins as outputs to control the LED bar
     // LED1
     P6DIR |= BIT4;
     P6OUT &= ~ BIT4;
@@ -12,8 +14,8 @@ void LEDbarInit(void){
     P2DIR |= BIT4;
     P2OUT &= ~ BIT4;
     // LED4
-    P3DIR |= BIT3;
-    P3OUT &= ~ BIT3;
+    P4DIR |= BIT0;
+    P4OUT &= ~BIT0;
     // LED5
     P3DIR |= BIT2;
     P3OUT &= ~ BIT2;
@@ -34,7 +36,8 @@ void LEDbarInit(void){
     P4OUT &= ~ BIT6;
 }
 
-void pattern1(void){
+void pattern0(void){
+    // Sets LED bar to a 1010101010 static pattern
     ON(1);
     OFF(2);
     ON(3);
@@ -47,7 +50,31 @@ void pattern1(void){
     OFF(10);
 }
 
+void pattern0_alt(void){
+    // Sets LED bar to a 0101010101 static pattern
+    OFF(1);
+    ON(2);
+    OFF(3);
+    ON(4);
+    OFF(5);
+    ON(6);
+    OFF(7);
+    ON(8);
+    OFF(9);
+    ON(10);
+}
+
+void pattern1(){
+    while(scanPad() == NULL){
+        pattern0();
+        __delay_cycles(500000);
+        pattern0_alt();
+        __delay_cycles(500000);
+    }
+}
+
 void clear(void){
+    // Turns every LED off
     OFF(1);
     OFF(2);
     OFF(3);
@@ -61,6 +88,7 @@ void clear(void){
 }
 
 void ON(int led){
+    // Turns LED on the LED bar ON depending on the given int
     switch(led){
         case 1:     P6OUT |= BIT4;
                     break;
@@ -68,7 +96,7 @@ void ON(int led){
                     break;
         case 3:     P2OUT |= BIT4;
                     break;
-        case 4:     P3OUT |= BIT3;
+        case 4:     P4OUT |= BIT0;
                     break;
         case 5:     P3OUT |= BIT2;
                     break;
@@ -87,6 +115,7 @@ void ON(int led){
 }
 
 void OFF(int led){
+    // Turns LED on the LED bar OFF depending on the given int
     switch(led){
         case 1:     P6OUT &= ~BIT4;
                     break;
@@ -94,7 +123,7 @@ void OFF(int led){
                     break;
         case 3:     P2OUT &= ~BIT4;
                     break;
-        case 4:     P3OUT &= ~BIT3;
+        case 4:     P4OUT &= ~BIT0;
                     break;
         case 5:     P3OUT &= ~BIT2;
                     break;

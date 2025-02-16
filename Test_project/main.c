@@ -46,10 +46,7 @@ int main(void) {
     __enable_interrupt();
 
 
-    while (locked == 0) {  // Loop until unlocked
-        lockKeypad();
-        locked = 1;
-    }
+    lockKeypad();
     while(1) {          // Loop forever
         char input = scanPad();
         switch(input){
@@ -57,6 +54,9 @@ int main(void) {
                         lockKeypad();
                         break;
             case '1':   pattern1();
+                        break;
+            case '2':   ON(4);
+                        break;
         }
     }
 
