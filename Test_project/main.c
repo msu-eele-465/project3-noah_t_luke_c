@@ -53,11 +53,10 @@ int main(void) {
     while(1) {          // Loop forever
         char input = scanPad();
         switch(input){
-            case '1':   lockKeypad();
+            case 'D':   clear();
+                        lockKeypad();
                         break;
-            case '1':   A = 1;
-                        P6OUT ^= BIT6;
-                        break;
+            case '1':   pattern1();
         }
     }
 
