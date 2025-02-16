@@ -60,8 +60,8 @@ void ON(int led){
     }
 }
 
-void ON(int led){
-    switch(led){
+void OFF(int l){
+    switch(l){
         case 1:     P6OUT &= ~BIT4;
                     break;
         case 2:     P3OUT &= ~BIT7;
