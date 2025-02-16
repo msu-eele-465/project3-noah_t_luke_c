@@ -5,7 +5,7 @@
 #include <stdbool.h>
 #include <string.h>
 #include <keypad.h>
-#include<LEDbar.h>
+#include <LEDbar.h>
 
 #define unlock_code "1738"
 
@@ -56,34 +56,13 @@ int main(void) {
         char input = scanPad();
         switch(input){
             case 'D':   lockKeypad();
-            case 'A':   turnON(1);
+            case 'A':   ON(1);
         }
     }
 
     return 0;
 }
 
-//-----------------------------------------------Scan Keypad------------------------------------------------------------------------
-
-char scanPad() {
-    int row, col;  // Loop variables
-
-    for (col = 0; col < 4; col++) {
-        P6OUT &= ~(BIT0 | BIT1 | BIT2 | BIT3);  // Clear all column pins
-        P6OUT |= colPins[col];  // Set the current column pin high
-
-        for (row = 0; row < 4; row++) {
-            if ((P5IN & rowPins[row]) != 0) {  // Check if the row pin is high
-                P6OUT ^= BIT6;  // Toggle LED for feedback
-                while ((P5IN & rowPins[row]) != 0);  // Wait for key release
-                __delay_cycles(50000);  // Debounce delay
-                return keys[row][col];  // Return the pressed key
-            }
-        }
-    }
-
-    return 0;  // Return 0 if no key is pressed
-}
 
 
 //------------------------------------------------------------------------------
