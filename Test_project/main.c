@@ -7,8 +7,6 @@
 #include <keypadTest.h>
 #include<LEDbar.h>
 
-#define unlock_code "1738"
-#define A P6OUT.BIT4
 //const char keys[4][4] = {{'1','2','3','A'},{'4','5','6','B'},{'7','8','9','C'},{'*','0','#','D'}};
 //const char rowPins[4] = {BIT0, BIT1, BIT2, BIT3};
 //const char colPins[4] = {BIT0, BIT1, BIT2, BIT3};
@@ -46,18 +44,9 @@ int main(void) {
     __enable_interrupt();
 
 
-    lockKeypad();
+    lockKeypad(unlock_code);
     while(1) {          // Loop forever
-        char input = scanPad();
-        switch(input){
-            case 'D':   clear();
-                        lockKeypad();
-                        break;
-            case '1':   pattern1();
-                        break;
-            case '2':   ON(4);
-                        break;
-        }
+        testInput();
     }
 
     return 0;
