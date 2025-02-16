@@ -65,14 +65,10 @@ void pattern0_alt(void){
 }
 
 void pattern1(){
-    while(1){
         pattern0();
-        testInput();
         __delay_cycles(500000);
         pattern0_alt();
-        testInput();
         __delay_cycles(500000);
-    }
 }
 
 void clear(void){
@@ -142,3 +138,4 @@ void OFF(int led){
         default:    break;                                                                                                                              
     }
 }
+
