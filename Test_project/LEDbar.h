@@ -2,6 +2,8 @@
 #include <msp430.h>
 #include <stdbool.h>
 
+int period = 1000;
+
 void LEDbarInit(void){
     // Setting GPIO pins as outputs to control the LED bar
     // LED1
@@ -66,9 +68,9 @@ void pattern0_alt(void){
 
 void pattern1(){
         pattern0();
-        __delay_cycles(500000);
+        delay(period);
         pattern0_alt();
-        __delay_cycles(500000);
+        delay(period);
 }
 
 void clear(void){
@@ -139,3 +141,9 @@ void OFF(int led){
     }
 }
 
+void delay(int cycles){
+    while(cycles != 0){
+        __delay_cycles(1000);
+        cycles--;
+    }
+}

@@ -40,7 +40,7 @@ void keypadInit(void){
 
 
 void lockKeypad(char str[]){ // Reset system until correct password is typed in
-        P1IE &= ~(BIT1 + BIT2 + BIT3 + BIT4);   // Disenable IRQs
+        P1IE &= ~(BIT1 + BIT2 + BIT3 + BIT4);   // Disable IRQs
         clear();
         P3OUT &= ~BIT6;
         P1OUT |= BIT7;

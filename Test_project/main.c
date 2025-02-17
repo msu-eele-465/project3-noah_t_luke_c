@@ -90,6 +90,10 @@ __interrupt void ISR_PORT1_S2(void) {
                         break;
             case '1':   pattern = '1';
                         break;
+            case 'A':   period = period + 500;
+                        break;
+            case 'B':   period = period - 500;
+                        break;
                         
         }
 
