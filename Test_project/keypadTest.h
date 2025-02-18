@@ -17,7 +17,7 @@ void keypadInit(void){
     P1DIR |= BIT7;  // P1.7 as output
     P1OUT &= ~BIT7;  // Clear P1.7
 
-    // Column pins are 6.0 - 6.3, right 4 pins on Keypad, descending left to right. Connected to ground through resistors
+    // Column pins are 6.0 - 6.3, right 4 pins on Keypad, descending left to right.
     // Pin 6.0 is column 0 (connected to the middle of the keypad) (column 0 is the furthest left column)
     // Pin 6.3 is column 3 (connected to the right of the keypad) (column 3 is the furthest right column)
     P6DIR &= ~(BIT0 + BIT1 + BIT2 + BIT3);  // Clear column pins
@@ -25,8 +25,8 @@ void keypadInit(void){
     P6OUT |= (BIT0 + BIT1 + BIT2 + BIT3);  // Set column pins high
 
     // Row pins are 1.1 - 1.4, left 4 pins, descending left to right
-    // Pin 1.1 is row 0 (connected to the middle of the keypad) (row 0 is the top column)
-    // Pin 1.4 is row 3 (connected to the left of the keypad) (row 3 is the bottom column)
+    // Pin 1.4 is row 0 (connected to the middle of the keypad) (row 0 is the top row)
+    // Pin 1.1 is row 3 (connected to the left of the keypad) (row 3 is the bottom row)
     P1DIR &= ~(BIT1 + BIT2 + BIT4 + BIT4);  // Set row pins as inputs
     P1REN |= (BIT1 + BIT2 + BIT3 + BIT4);  // Enable pull-up/down resistors
     P1OUT &= ~(BIT1 + BIT2 + BIT3 + BIT4);  // Set pull-down for resistors
@@ -57,7 +57,7 @@ void lockKeypad(char str[]){ // Reset system until correct password is typed in
         TB0CCTL0 |= CCIE;  // Enable timer flag
 }
 
-
+/*
 void testInput(){ // Test the keypad after system unlocks
     char input = scanPad();
         switch(input){
@@ -73,7 +73,7 @@ void testInput(){ // Test the keypad after system unlocks
                         
         }
 }
-   
+*/
 
 char scanPad() { // Scan the keypad
     int row, col;  // Loop variables

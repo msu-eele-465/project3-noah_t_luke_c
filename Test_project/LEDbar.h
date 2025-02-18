@@ -30,12 +30,6 @@ void LEDbarInit(void){
     // LED8
     P4DIR |= BIT4;
     P4OUT &= ~ BIT4;
-    // LED9
-    P4DIR |= BIT7;
-    P4OUT &= ~ BIT7;
-    // LED10
-    P4DIR |= BIT6;
-    P4OUT &= ~ BIT6;
 }
 
 void pattern0(void){
@@ -48,8 +42,6 @@ void pattern0(void){
     OFF(6);
     ON(7);
     OFF(8);
-    ON(9);
-    OFF(10);
 }
 
 void pattern0_alt(void){
@@ -62,15 +54,19 @@ void pattern0_alt(void){
     ON(6);
     OFF(7);
     ON(8);
-    OFF(9);
-    ON(10);
 }
 
-void pattern1(){
+int pattern1(int start){
+    if(start == 0){
         pattern0();
-        delay(period);
+        return 1;
+    }else if(start == 1){
         pattern0_alt();
-        delay(period);
+        return 0;
+    }
+    else{
+        return 0;
+    }
 }
 
 void clear(void){
@@ -83,8 +79,6 @@ void clear(void){
     OFF(6);
     OFF(7);
     OFF(8);
-    OFF(9);
-    OFF(10);
 }
 
 void ON(int led){
@@ -105,10 +99,6 @@ void ON(int led){
         case 7:     P2OUT |= BIT5;
                     break;
         case 8:     P4OUT |= BIT4;
-                    break;
-        case 9:     P4OUT |= BIT7;
-                    break;
-        case 10:    P4OUT |= BIT6;
                     break;
         default:    break;                                                                                                                              
     }
@@ -132,10 +122,6 @@ void OFF(int led){
         case 7:     P2OUT &= ~BIT5;
                     break;
         case 8:     P4OUT &= ~BIT4;
-                    break;
-        case 9:     P4OUT &= ~BIT7;
-                    break;
-        case 10:    P4OUT &= ~BIT6;
                     break;
         default:    break;                                                                                                                              
     }

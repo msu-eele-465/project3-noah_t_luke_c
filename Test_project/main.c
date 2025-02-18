@@ -5,11 +5,9 @@
 #include <stdbool.h>
 #include <string.h>
 #include <keypadTest.h>
-//#include<LEDbar.h>
+
 char pattern;
-//const char keys[4][4] = {{'1','2','3','A'},{'4','5','6','B'},{'7','8','9','C'},{'*','0','#','D'}};
-//const char rowPins[4] = {BIT0, BIT1, BIT2, BIT3};
-//const char colPins[4] = {BIT0, BIT1, BIT2, BIT3};
+int start1 = 0;
 
 int main(void) {
     LEDbarInit();
@@ -17,6 +15,7 @@ int main(void) {
     char code_entered[5] = "";
     int index_code = 0;
     bool unlock = false;
+    
 
     WDTCTL = WDTPW | WDTHOLD;  // Stop watchdog timer
 
@@ -40,7 +39,8 @@ int main(void) {
     TB0CCTL0 |= CCIE;  // Enable flag
 
     // Set up timer compare IRQs
-    //TB0CCTL1 &= ~CCIFG;  // Clear CCR0 flag
+    TB0CCTL1 &= ~CCIFG;  // Clear CCR1 flag
+    TB0CCTL1 |= CCIE;  // Enable flag
     
 
 
@@ -49,9 +49,11 @@ int main(void) {
     __enable_interrupt();
 
 
-    lockKeypad(unlock_code);
+    //lockKeypad(unlock_code);
    
     while(1) {          // Loop forever
+        /*
+        delay(period);
         switch (pattern){
             case 'D':   clear();
                         lockKeypad(unlock_code);
@@ -61,14 +63,12 @@ int main(void) {
                             pattern0();
                         }
                         break;
-            case '1':   clear();
-                        while(pattern == '1'){
-                        pattern1();
+            case '1':   start1 = pattern1(start1);
                         break;
-                        }
             default:    clear();
                         break;
-        }
+            
+        }*/
     }
 
     return 0;
@@ -86,7 +86,7 @@ __interrupt void ISR_TB0_CCR0(void) {
     TB0CCTL0 &= ~CCIFG;  // Clear the interrupt flag
 }
 
-/*
+
 #pragma vector = TIMER0_B1_VECTOR
 __interrupt void ISR_TB0_CCR1(void) {
     switch (pattern){
@@ -97,13 +97,14 @@ __interrupt void ISR_TB0_CCR1(void) {
                         pattern0();
                         break;
             case '1':   clear();
-                        pattern1();
+                        start1 = pattern1(start1);
                         break;
             default:    clear();
                         break;
         }
+    TB0CCTL1 &= ~CCIFG;
 }
-*/
+
 
 #pragma vector = PORT1_VECTOR
 __interrupt void ISR_PORT1_S2(void) {
