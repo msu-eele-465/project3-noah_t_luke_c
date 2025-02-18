@@ -8,69 +8,15 @@
 
 char pattern;
 int start1 = 0;
+int start2 = 0;
+int start3 = 0;
 
 int main(void) {
     LEDbarInit();
     keypadInit();
-    char code_entered[5] = "";
-    int index_code = 0;
-    bool unlock = false;
-    
-
-    WDTCTL = WDTPW | WDTHOLD;  // Stop watchdog timer
-
-    P1DIR |= BIT0;  // P1.0 as output, used for heartbeat LED
-    P1OUT &= ~BIT0;  // Clear P1.0
-
-    P6DIR |= BIT6;  // Green LED feedback
-    P6OUT &= ~BIT6;
-
-    PM5CTL0 &= ~LOCKLPM5;  // Enable GPIO
-
-    // Setup Timer B0
-    TB0CTL |= TBCLR;  // Clear timer and dividers
-    TB0CTL |= TBSSEL__ACLK;  // Use ACLK
-    TB0CTL |= MC__UP;  // Up counting mode
-    TB0CCR0 = 32768;    // Compare value
-    TB0CCR1 = 16000;    // CCR1 value
-
-    // Set up timer compare IRQs
-    TB0CCTL0 &= ~CCIFG;  // Clear CCR0 flag
-    TB0CCTL0 |= CCIE;  // Enable flag
-
-    // Set up timer compare IRQs
-    TB0CCTL1 &= ~CCIFG;  // Clear CCR1 flag
-    TB0CCTL1 |= CCIE;  // Enable flag
-    
-
-
-
-
     __enable_interrupt();
-
-
-    //lockKeypad(unlock_code);
-   
-    while(1) {          // Loop forever
-        /*
-        delay(period);
-        switch (pattern){
-            case 'D':   clear();
-                        lockKeypad(unlock_code);
-                        pattern = NULL;
-            case '0':   clear();
-                        while(pattern == '0'){
-                            pattern0();
-                        }
-                        break;
-            case '1':   start1 = pattern1(start1);
-                        break;
-            default:    clear();
-                        break;
-            
-        }*/
-    }
-
+    lockKeypad(unlock_code);   
+    while(1) {}          // Loop forever
     return 0;
 }
 
@@ -99,6 +45,12 @@ __interrupt void ISR_TB0_CCR1(void) {
             case '1':   clear();
                         start1 = pattern1(start1);
                         break;
+            case '2':   clear();
+                        start2 = pattern2(start2);
+                        break;
+            case '3':   clear();
+                        start3 = pattern3(start3);
+                        break;
             default:    clear();
                         break;
         }
@@ -116,9 +68,19 @@ __interrupt void ISR_PORT1_S2(void) {
                         break;
             case '1':   pattern = '1';
                         break;
-            case 'A':   period = period + 500;
+            case '2':   if(pattern == '2'){
+                            start2 = 0;
+                        }
+                        pattern = '2';
                         break;
-            case 'B':   period = period - 500;
+            case '3':   if(pattern == '3'){
+                            start3 = 0;
+                        }
+                        pattern = '3';
+                        break;
+            case 'A':   TB0CCR1 = TB0CCR1 - 8192;
+                        break;
+            case 'B':   TB0CCR1 = TB0CCR1 + 8192;
                         break;
                         
         }
