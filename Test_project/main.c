@@ -33,10 +33,16 @@ int main(void) {
     TB0CTL |= TBSSEL__ACLK;  // Use ACLK
     TB0CTL |= MC__UP;  // Up counting mode
     TB0CCR0 = 32768;    // Compare value
+    TB0CCR1 = 16000;    // CCR1 value
 
     // Set up timer compare IRQs
     TB0CCTL0 &= ~CCIFG;  // Clear CCR0 flag
     TB0CCTL0 |= CCIE;  // Enable flag
+
+    // Set up timer compare IRQs
+    //TB0CCTL1 &= ~CCIFG;  // Clear CCR0 flag
+    
+
 
 
 
@@ -44,6 +50,7 @@ int main(void) {
 
 
     lockKeypad(unlock_code);
+   
     while(1) {          // Loop forever
         switch (pattern){
             case 'D':   clear();
@@ -79,6 +86,24 @@ __interrupt void ISR_TB0_CCR0(void) {
     TB0CCTL0 &= ~CCIFG;  // Clear the interrupt flag
 }
 
+/*
+#pragma vector = TIMER0_B1_VECTOR
+__interrupt void ISR_TB0_CCR1(void) {
+    switch (pattern){
+            case 'D':   clear();
+                        lockKeypad(unlock_code);
+                        pattern = NULL;
+            case '0':   clear();
+                        pattern0();
+                        break;
+            case '1':   clear();
+                        pattern1();
+                        break;
+            default:    clear();
+                        break;
+        }
+}
+*/
 
 #pragma vector = PORT1_VECTOR
 __interrupt void ISR_PORT1_S2(void) {

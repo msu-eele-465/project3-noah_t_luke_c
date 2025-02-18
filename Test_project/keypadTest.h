@@ -17,9 +17,9 @@ void keypadInit(void){
     P1DIR |= BIT7;  // P1.7 as output
     P1OUT &= ~BIT7;  // Clear P1.7
 
-    // Column pins are 6.0 - 6.3, right 4 pins on Keypad, descending left to right
-    // Pin 5.0 is column 0 (connected to the middle of the keypad) (column 0 is the furthest left column)
-    // Pin 5.3 is column 3 (connected to the right of the keypad) (column 3 is the furthest right column)
+    // Column pins are 6.0 - 6.3, right 4 pins on Keypad, descending left to right. Connected to ground through resistors
+    // Pin 6.0 is column 0 (connected to the middle of the keypad) (column 0 is the furthest left column)
+    // Pin 6.3 is column 3 (connected to the right of the keypad) (column 3 is the furthest right column)
     P6DIR &= ~(BIT0 + BIT1 + BIT2 + BIT3);  // Clear column pins
     P6DIR |= (BIT0 + BIT1 + BIT2 + BIT3);  // Set column pins as outputs
     P6OUT |= (BIT0 + BIT1 + BIT2 + BIT3);  // Set column pins high
@@ -40,6 +40,7 @@ void keypadInit(void){
 
 
 void lockKeypad(char str[]){ // Reset system until correct password is typed in
+        //TB0CCTL1 &= ~CCIE;  // Disable timer flag
         P1IE &= ~(BIT1 + BIT2 + BIT3 + BIT4);   // Disable IRQs
         clear();
         P3OUT &= ~BIT6;
@@ -53,6 +54,7 @@ void lockKeypad(char str[]){ // Reset system until correct password is typed in
         P1OUT &= ~BIT7;
         P3OUT |= BIT6;
         P1IE |= (BIT1 + BIT2 + BIT3 + BIT4);   // Enable IRQs
+        TB0CCTL0 |= CCIE;  // Enable timer flag
 }
 
 
@@ -75,22 +77,22 @@ void testInput(){ // Test the keypad after system unlocks
 
 char scanPad() { // Scan the keypad
     int row, col;  // Loop variables
-    P6OUT &= ~(BIT0 + BIT1 + BIT2 + BIT3);  // Clear column pins
+    P6OUT &= ~(BIT0 + BIT1 + BIT2 + BIT3);  // Clear row pins
 
     for (col = 0; col < 4; col++) {
-        P6OUT &= ~(BIT0 | BIT1 | BIT2 | BIT3);  // Clear all column pins
-        P6OUT |= colPins[col];  // Set the current column pin high
+        P6OUT &= ~(BIT0 | BIT1 | BIT2 | BIT3);  // Clear all row pins
+        P6OUT |= colPins[col];  // Set the current row pin high
 
         for (row = 0; row < 4; row++) {
-            if ((P1IN & rowPins[row]) != 0) {  // Check if the row pin is high
+            if ((P1IN & rowPins[row]) != 0) {  // Check if the column pin is high
                 while ((P1IN & rowPins[row]) != 0);  // Wait for key release
                 __delay_cycles(50000);  // Debounce delay
-                P6OUT |= (BIT0 + BIT1 + BIT2 + BIT3);  // Set column pins high
-                return keys[col][row];  // Return the pressed key
+                P6OUT |= (BIT0 + BIT1 + BIT2 + BIT3);  // Set row pins high
+                return keys[row][col];  // Return the pressed key
             }
         }
     }
-    P6OUT |= (BIT0 + BIT1 + BIT2 + BIT3);  // Set column pins high
+    P6OUT |= (BIT0 + BIT1 + BIT2 + BIT3);  // Set row pins high
     return 0;  // Return 0 if no key is pressed
 }
 
