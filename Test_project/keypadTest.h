@@ -62,54 +62,34 @@ void keypadInit(void){
     // Set up timer compare IRQs
     TB0CCTL1 &= ~CCIFG;  // Clear CCR1 flag
     TB0CCTL1 |= CCIE;  // Enable flag
+
 }
 
 
 void lockKeypad(char str[]){ // Reset system until correct password is typed in
-        //TB0CCTL1 &= ~CCIE;  // Disable timer flag
+        TB0CCTL1 &= ~CCIE;  // Disable timer flag
+
         P1IE &= ~(BIT1 + BIT2 + BIT3 + BIT4);   // Disable IRQs
         clear();
+        P1OUT &= ~BIT6;
         P3OUT &= ~BIT6;
         P1OUT |= BIT7;
-        int count = 0;
-        char input[4];
-        while(count != 4){
-            while((input[count] = scanPad()) == 0);
-            input[count] = scanPad();
-            P1OUT |= BIT6;
-            count++;
-        }
            
-        /*while(scanPad() != str[0]);    // Wait for a 1
+        while(scanPad() != str[0]);    // Wait for a 1
         P1OUT |= BIT6;
         while(scanPad() != str[1]);    // Wait for a 7
         while(scanPad() != str[2]);    // Wait for a 3
         while(scanPad() != str[3]);    // Wait for an 8
-        */
+        
         P1OUT &= ~BIT6;
         P1OUT &= ~BIT7;
         P3OUT |= BIT6;
         P1IE |= (BIT1 + BIT2 + BIT3 + BIT4);   // Enable IRQs
-        TB0CCTL0 |= CCIE;  // Enable timer flag
+        TB0CCTL1 |= CCIE;  // Enable timer flag
+        
 }
 
-/*
-void testInput(){ // Test the keypad after system unlocks
-    char input = scanPad();
-        switch(input){
-            case 'D':   clear();
-                        lockKeypad(unlock_code);
-                        break;
-            case '1':   clear;
-                        pattern1();
-                        break;
-            case '2':   clear();
-                        pattern0();
-                        break;
-                        
-        }
-}
-*/
+
 
 char scanPad() { // Scan the keypad
     int row, col;  // Loop variables
