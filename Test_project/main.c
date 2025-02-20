@@ -5,61 +5,22 @@
 #include <stdbool.h>
 #include <string.h>
 #include <keypadTest.h>
-#include<LEDbar.h>
 
-#define unlock_code "1738"
-#define A P6OUT.BIT4
-//const char keys[4][4] = {{'1','2','3','A'},{'4','5','6','B'},{'7','8','9','C'},{'*','0','#','D'}};
-//const char rowPins[4] = {BIT0, BIT1, BIT2, BIT3};
-//const char colPins[4] = {BIT0, BIT1, BIT2, BIT3};
+char pattern;
+int start1 = 0;
+int start2 = 0;
+int start3 = 0;
+int start4 = 255;
+int start5 = 0;
+int start6 = 0;
+int start7 = 0;
 
 int main(void) {
     LEDbarInit();
     keypadInit();
-    int locked = 0;
-    char code_entered[5] = "";
-    int index_code = 0;
-    bool unlock = false;
-
-    WDTCTL = WDTPW | WDTHOLD;  // Stop watchdog timer
-
-    P1DIR |= BIT0;  // P1.0 as output, used for heartbeat LED
-    P1OUT &= ~BIT0;  // Clear P1.0
-
-    P6DIR |= BIT6;  // Green LED feedback
-    P6OUT &= ~BIT6;
-
-    PM5CTL0 &= ~LOCKLPM5;  // Enable GPIO
-
-    // Setup Timer B0
-    TB0CTL |= TBCLR;  // Clear timer and dividers
-    TB0CTL |= TBSSEL__ACLK;  // Use ACLK
-    TB0CTL |= MC__UP;  // Up counting mode
-    TB0CCR0 = 32768;    // Compare value
-
-    // Set up timer compare IRQs
-    TB0CCTL0 &= ~CCIFG;  // Clear CCR0 flag
-    TB0CCTL0 |= CCIE;  // Enable flag
-
-
-
     __enable_interrupt();
-
-
-    lockKeypad();
-    while(1) {          // Loop forever
-        char input = scanPad();
-        switch(input){
-            case 'D':   clear();
-                        lockKeypad();
-                        break;
-            case '1':   pattern1();
-                        break;
-            case '2':   ON(4);
-                        break;
-        }
-    }
-
+    //lockKeypad(unlock_code);   
+    while(1) {}          // Loop forever
     return 0;
 }
 
@@ -73,4 +34,161 @@ int main(void) {
 __interrupt void ISR_TB0_CCR0(void) {
     P1OUT ^= BIT0;  // Toggle LED
     TB0CCTL0 &= ~CCIFG;  // Clear the interrupt flag
+}
+
+
+#pragma vector = TIMER0_B1_VECTOR
+__interrupt void ISR_TB0_CCR1(void) {
+    switch (pattern){
+            case 'D':   clear();
+                        lockKeypad(unlock_code);
+                        pattern = NULL;
+            case '0':   clear();
+                        pattern0();
+                        break;
+            case '1':   clear();
+                        start1 = pattern1(start1);
+                        break;
+            case '2':   clear();
+                        start2 = pattern2(start2);
+                        break;
+            case '3':   clear();
+                        start3 = pattern3(start3);
+                        break;
+            case '4':   clear();
+                        start4 = pattern4(start4);
+                        break;
+            case '5':   clear();
+                        start5 = pattern5(start5);
+                        break;
+            case '6':   allOn();
+                        start6 = pattern6(start6);
+                        break;
+            case '7':   clear();
+                        start7 = pattern7(start7);
+                        break;
+            default:    break;
+        }
+    TB0CCTL1 &= ~CCIFG;
+}
+
+
+
+#pragma vector = PORT1_VECTOR
+__interrupt void ISR_PORT1_S2(void) {
+    char input = scanPad();
+        switch(input){
+            case 'D':   clear();
+                        lockKeypad(unlock_code);
+                        break;
+            case '0':   pattern = '0';
+                        clear();
+                        pattern0();
+                        break;
+            case '1':   if(pattern == '1'){
+                            start1 = 0;
+                        }
+                        clear();
+                        start1 = pattern1(start1);
+                        TB0CTL &= ~MC__UP;  // Stop counting mode
+                        TB0CTL |= TBCLR;  // Clear timer and dividers
+                        __delay_cycles(2);
+                        TB0CTL |= MC__UP;   // Start Up counting mode
+                        pattern = '1';
+                        break;
+            case '2':   if(pattern == '2'){
+                            start2 = 0;
+                        }
+                        clear();
+                        start2 = pattern2(start2);
+                        TB0CTL &= ~MC__UP;  // Stop counting mode
+                        TB0CTL |= TBCLR;  // Clear timer and dividers
+                        __delay_cycles(2);
+                        TB0CTL |= MC__UP;   // Start Up counting mode
+                        pattern = '2';
+                        break;
+            case '3':   if(pattern == '3'){
+                            start3 = 0;
+                        }
+                        clear();
+                        start3 = pattern3(start3);
+                        TB0CTL &= ~MC__UP;  // Stop counting mode
+                        TB0CTL |= TBCLR;  // Clear timer and dividers
+                        __delay_cycles(2);
+                        TB0CTL |= MC__UP;   // Start Up counting mode
+                        pattern = '3';
+                        break;
+            case '4':   if(pattern == '4'){
+                            start4 = 255;
+                        }
+                        clear();
+                        start4 = pattern4(start4);
+                        TB0CTL &= ~MC__UP;  // Stop counting mode
+                        TB0CTL |= TBCLR;  // Clear timer and dividers
+                        __delay_cycles(2);
+                        TB0CTL |= MC__UP;   // Start Up counting mode
+                        pattern = '4';
+                        break;
+            case '5':   if(pattern == '5'){
+                            start5 = 0;
+                        }
+                        clear();
+                        start5 = pattern5(start5);
+                        TB0CTL &= ~MC__UP;  // Stop counting mode
+                        TB0CTL |= TBCLR;  // Clear timer and dividers
+                        __delay_cycles(2);
+                        TB0CTL |= MC__UP;   // Start Up counting mode
+                        pattern = '5';
+                        break;
+            case '6':   if(pattern == '6'){
+                            start6 = 0;
+                        }
+                        allOn();
+                        start6 = pattern6(start6);
+                        TB0CTL &= ~MC__UP;  // Stop counting mode
+                        TB0CTL |= TBCLR;  // Clear timer and dividers
+                        __delay_cycles(2);
+                        TB0CTL |= MC__UP;   // Start Up counting mode
+                        pattern = '6';
+                        break;
+            case '7':   if(pattern == '7'){
+                            start7 = 0;
+                        }
+                        clear();
+                        start7 = pattern7(start7);
+                        TB0CTL &= ~MC__UP;  // Stop counting mode
+                        TB0CTL |= TBCLR;  // Clear timer and dividers
+                        __delay_cycles(2);
+                        TB0CTL |= MC__UP;   // Start Up counting mode
+                        pattern = '7';
+                        break;
+            case 'A':   TB0CCTL1 &= ~CCIE;  // Enable flag
+                        TB0CTL &= ~MC__UP;  // Stop counting mode
+                        TB0CTL |= TBCLR;    // Clear timer and dividers
+                        TB0CTL &= ~CM;
+                        __delay_cycles(2);
+                        TB0CCR1 = TB0CCR1 - 8192;
+                        TB0CCR0 = TB0CCR1;
+                        TB0CTL |= CM;
+                        TB0CTL |= MC__UP;   // Start timer
+                        TB0CCTL1 |= CCIE;  // Enable flag    
+                        break;
+            case 'B':   TB0CCTL1 &= ~CCIE;  // Enable flag
+                        TB0CTL &= ~MC__UP;  // Stop counting mode
+                        TB0CTL |= TBCLR;    // Clear timer and dividers
+                        TB0CTL &= ~CM;
+                        __delay_cycles(2);
+                        TB0CCR1 = TB0CCR1 + 8192;
+                        TB0CCR0 = TB0CCR1;
+                        TB0CTL |= CM;
+                        TB0CTL |= MC__UP;   // Start timer
+                        TB0CCTL1 |= CCIE;  // Enable flag    
+                        break;
+                        
+        }
+
+    P1IFG &= ~BIT1;  // Clear the interrupt flag
+    P1IFG &= ~BIT2;  // Clear the interrupt flag
+    P1IFG &= ~BIT3;  // Clear the interrupt flag
+    P1IFG &= ~BIT4;  // Clear the interrupt flag
 }
