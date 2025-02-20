@@ -213,42 +213,43 @@ int pattern6(int current){  // Rotates the turned off LED one right each time
     if (current == 0){
         //allOn();
         OFF(1);
+        return 1;
     }
     if (current == 1){
         //allOn();
-        OFF(8);
+        OFF(2);
+        return 2;
     }
     if (current == 2){
         //allOn();
-        OFF(7);
+        OFF(3);
+        return 3;
+    }
+    if (current == 3){
+        //allOn();
+        OFF(4);
+        return 4;
     }
     if (current == 4){
         //allOn();
-        OFF(6);
+        OFF(5);
+        return 5;
     }
     if (current == 5){
         //allOn();
-        OFF(5);
+        OFF(6);
+        return 6;
     }
     if (current == 6){
         //allOn();
-        OFF(4);
+        OFF(7);
+        return 7;
     }
     if (current == 7){
         //allOn();
-        OFF(3);
+        OFF(8);
+        return 0;
     }
-    if (current == 8){
-        //allOn();
-        OFF(2);
-    }
-    if (current == 0){
-        current = 8;
-    }
-    else{
-        current--;
-    }
-    return current;
 }
 
 int pattern7(int current){  // Loading bar looking thing, turns on each led in a row
