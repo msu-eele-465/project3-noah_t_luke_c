@@ -19,7 +19,7 @@ int main(void) {
     LEDbarInit();
     keypadInit();
     __enable_interrupt();
-    lockKeypad(unlock_code);   
+    //lockKeypad(unlock_code);   
     while(1) {}          // Loop forever
     return 0;
 }
@@ -162,17 +162,27 @@ __interrupt void ISR_PORT1_S2(void) {
                         TB0CTL |= MC__UP;   // Start Up counting mode
                         pattern = '7';
                         break;
-            case 'A':   TB0CTL &= ~MC__UP;  // Stop counting mode
+            case 'A':   TB0CCTL1 &= ~CCIE;  // Enable flag
+                        TB0CTL &= ~MC__UP;  // Stop counting mode
                         TB0CTL |= TBCLR;    // Clear timer and dividers
+                        TB0CTL &= ~CM;
                         __delay_cycles(2);
-                        TB0CCR1 = 16384;    
+                        TB0CCR1 = TB0CCR1 - 8192;
+                        TB0CCR0 = TB0CCR1;
+                        TB0CTL |= CM;
                         TB0CTL |= MC__UP;   // Start timer
+                        TB0CCTL1 |= CCIE;  // Enable flag    
                         break;
-            case 'B':   TB0CTL &= ~MC__UP;  // Stop counting mode
+            case 'B':   TB0CCTL1 &= ~CCIE;  // Enable flag
+                        TB0CTL &= ~MC__UP;  // Stop counting mode
                         TB0CTL |= TBCLR;    // Clear timer and dividers
+                        TB0CTL &= ~CM;
                         __delay_cycles(2);
-                        TB0CCR1 = 32768;    
+                        TB0CCR1 = TB0CCR1 + 8192;
+                        TB0CCR0 = TB0CCR1;
+                        TB0CTL |= CM;
                         TB0CTL |= MC__UP;   // Start timer
+                        TB0CCTL1 |= CCIE;  // Enable flag    
                         break;
                         
         }
