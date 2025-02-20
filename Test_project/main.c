@@ -10,6 +10,10 @@ char pattern;
 int start1 = 0;
 int start2 = 0;
 int start3 = 0;
+int start4 = 0;
+int start5 = 0;
+int start6 = 0;
+int start7 = 0;
 
 int main(void) {
     LEDbarInit();
@@ -51,6 +55,19 @@ __interrupt void ISR_TB0_CCR1(void) {
             case '3':   clear();
                         start3 = pattern3(start3);
                         break;
+            case '4':   clear();
+                        start4 = pattern4(start4);
+                        break;
+            case '5':   clear();
+                        start5 = pattern5(start5);
+                        break;
+            case '6':   clear();
+                        allOn();
+                        start6 = pattern6(start6);
+                        break;
+            case '7':   clear();
+                        start7 = pattern7(start7);
+                        break;
             default:    break;
         }
     TB0CCTL1 &= ~CCIFG;
@@ -62,14 +79,17 @@ __interrupt void ISR_TB0_CCR1(void) {
 __interrupt void ISR_PORT1_S2(void) {
     char input = scanPad();
         switch(input){
-            case 'D':   lockKeypad(unlock_code);
+            case 'D':   clear();
+                        lockKeypad(unlock_code);
                         break;
             case '0':   pattern = '0';
+                        clear();
                         pattern0();
                         break;
             case '1':   if(pattern == '1'){
                             start1 = 0;
                         }
+                        clear();
                         start1 = pattern1(start1);
                         TB0CTL &= ~MC__UP;  // Stop counting mode
                         TB0CTL |= TBCLR;  // Clear timer and dividers
@@ -91,6 +111,7 @@ __interrupt void ISR_PORT1_S2(void) {
             case '3':   if(pattern == '3'){
                             start3 = 0;
                         }
+                        clear();
                         start3 = pattern3(start3);
                         TB0CTL &= ~MC__UP;  // Stop counting mode
                         TB0CTL |= TBCLR;  // Clear timer and dividers
@@ -98,10 +119,54 @@ __interrupt void ISR_PORT1_S2(void) {
                         TB0CTL |= MC__UP;   // Start Up counting mode
                         pattern = '3';
                         break;
+            case '4':   if(pattern == '4'){
+                            start4 = 0;
+                        }
+                        clear();
+                        start4 = pattern4(start4);
+                        TB0CTL &= ~MC__UP;  // Stop counting mode
+                        TB0CTL |= TBCLR;  // Clear timer and dividers
+                        __delay_cycles(2);
+                        TB0CTL |= MC__UP;   // Start Up counting mode
+                        pattern = '4';
+                        break;
+            case '5':   if(pattern == '5'){
+                            start5 = 0;
+                        }
+                        clear();
+                        start5 = pattern5(start5);
+                        TB0CTL &= ~MC__UP;  // Stop counting mode
+                        TB0CTL |= TBCLR;  // Clear timer and dividers
+                        __delay_cycles(2);
+                        TB0CTL |= MC__UP;   // Start Up counting mode
+                        pattern = '5';
+                        break;
+            case '6':   if(pattern == '6'){
+                            start6 = 0;
+                        }
+                        allOn();
+                        start6 = pattern6(start6);
+                        TB0CTL &= ~MC__UP;  // Stop counting mode
+                        TB0CTL |= TBCLR;  // Clear timer and dividers
+                        __delay_cycles(2);
+                        TB0CTL |= MC__UP;   // Start Up counting mode
+                        pattern = '6';
+                        break;
+            case '7':   if(pattern == '7'){
+                            start7 = 0;
+                        }
+                        clear();
+                        start7 = pattern7(start7);
+                        TB0CTL &= ~MC__UP;  // Stop counting mode
+                        TB0CTL |= TBCLR;  // Clear timer and dividers
+                        __delay_cycles(2);
+                        TB0CTL |= MC__UP;   // Start Up counting mode
+                        pattern = '7';
+                        break;
             case 'A':   TB0CTL &= ~MC__UP;  // Stop counting mode
                         TB0CTL |= TBCLR;    // Clear timer and dividers
                         __delay_cycles(2);
-                        TB0CCR1 = TB0CCTL1 - 8192;    
+                        TB0CCR1 = TB0CCR1 - 8192;    
                         TB0CTL |= MC__UP;   // Start timer
                         break;
             case 'B':   TB0CCR1 = TB0CCR1 + 8192;

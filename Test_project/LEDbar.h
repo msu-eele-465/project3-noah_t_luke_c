@@ -78,6 +78,18 @@ void OFF(int led){
     }
 }
 
+void allOn(void){
+    // Sets LED bar to a 0101010101 static pattern
+    ON(1);
+    ON(2);
+    ON(3);
+    ON(4);
+    ON(5);
+    ON(6);
+    ON(7);
+    ON(8);
+}
+
 void pattern0(void){
     // Sets LED bar to a 1010101010 static pattern
     ON(1);
@@ -151,6 +163,154 @@ int pattern3(int start){
                     ON(6);
                     return 0;
     }
+}
+
+int pattern4(int count){  // Down counter 
+    LEDON(count);
+    if(count == 0){
+        return 255;
+    }
+    count--;
+    return count;
+}
+
+int pattern5(int current){  // Rotates the turned on LED one left each time
+    if (current == 0){
+        ON(8);
+        return 1;
+    }
+    if (current == 1){
+        ON(7);
+        return 2;
+    }
+    if (current == 2){
+        ON(6);
+        return 3;
+    }
+    if (current == 3){
+        ON(5);  
+        return 4;  
+    }
+    if (current == 4){
+        ON(4);   
+        return 5; 
+    }
+    if (current == 5){
+        ON(3);
+        return 6;
+    }
+    if (current == 6){
+        ON(2);
+        return 7;
+    }
+    if (current == 7){
+        ON(1);
+        return 0;
+    }
+}
+
+int pattern6(int current){  // Rotates the turned off LED one right each time
+    if (current == 0){
+        //allOn();
+        OFF(1);
+    }
+    if (current == 1){
+        //allOn();
+        OFF(8);
+    }
+    if (current == 2){
+        //allOn();
+        OFF(7);
+    }
+    if (current == 4){
+        //allOn();
+        OFF(6);
+    }
+    if (current == 5){
+        //allOn();
+        OFF(5);
+    }
+    if (current == 6){
+        //allOn();
+        OFF(4);
+    }
+    if (current == 7){
+        //allOn();
+        OFF(3);
+    }
+    if (current == 8){
+        //allOn();
+        OFF(2);
+    }
+    if (current == 0){
+        current = 8;
+    }
+    else{
+        current--;
+    }
+    return current;
+}
+
+int pattern7(int current){  // Loading bar looking thing, turns on each led in a row
+    if (current == 0){
+        ON(8);
+    }
+    if (current == 1){
+        ON(8);
+        ON(7);
+    }
+    if (current == 2){
+        ON(8);
+        ON(7);
+        ON(6);
+    }
+    if (current == 4){
+        ON(8);
+        ON(7);
+        ON(6);
+        ON(5);
+    }
+    if (current == 5){
+        ON(8);
+        ON(7);
+        ON(6);
+        ON(5);
+        ON(4);
+    }
+    if (current == 6){
+        ON(8);
+        ON(7);
+        ON(6);
+        ON(5);
+        ON(4);
+        ON(3);
+    }
+    if (current == 7){
+        ON(8);
+        ON(7);
+        ON(6);
+        ON(5);
+        ON(4);
+        ON(3);
+        ON(2);
+    }
+    if (current == 8){
+        ON(8);
+        ON(7);
+        ON(6);
+        ON(5);
+        ON(4);
+        ON(3);
+        ON(2);
+        ON(1);
+    }
+    if (current == 8){
+        current = 0;
+    }
+    else{
+        current++;
+    }
+    return current;
 }
 
 void clear(void){
