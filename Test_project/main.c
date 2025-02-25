@@ -14,6 +14,7 @@ int start4 = 255;
 int start5 = 0;
 int start6 = 0;
 int start7 = 0;
+int basePeriod = 32768;
 
 int main(void) {
     LEDbarInit();
@@ -162,12 +163,13 @@ __interrupt void ISR_PORT1_S2(void) {
                         TB0CTL |= MC__UP;   // Start Up counting mode
                         pattern = '7';
                         break;
-            case 'A':   TB0CCTL1 &= ~CCIE;  // Enable flag
+            case 'A':   basePeriod = basePeriod - 8192;
+                        TB0CCTL1 &= ~CCIE;  // Enable flag
                         TB0CTL &= ~MC__UP;  // Stop counting mode
                         TB0CTL |= TBCLR;    // Clear timer and dividers
                         TB0CTL &= ~CM;
                         __delay_cycles(2);
-                        TB0CCR1 = TB0CCR1 - 8192;
+                        TB0CCR1 = basePeriod;
                         TB0CCR0 = TB0CCR1;
                         TB0CTL |= CM;
                         TB0CTL |= MC__UP;   // Start timer
