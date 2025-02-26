@@ -1,0 +1,23 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "app",
+            "type": "ccs-debug",
+            "request": "launch",
+            "projectInfo": {
+                "name": "app",
+                "resourceId": "/app"
+            }
+        },
+        {
+            "name": "Test_project",
+            "type": "ccs-debug",
+            "request": "launch",
+            "projectInfo": {
+                "name": "Test_project",
+                "resourceId": "/Test_project"
+            }
+        }
+    ]
+}
